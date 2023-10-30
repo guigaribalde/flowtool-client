@@ -1,8 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import SocketContextProviderComponent from '@/utils/contexts/SocketContext/Provider';
-import PointerBoard from '@/components/PointerBoard';
+import { ClerkProvider } from '@clerk/nextjs';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -19,10 +18,7 @@ export default function RootLayout({
 	return (
 		<html lang="pt-BR" className="overflow-hidden">
 			<body className={inter.className}>
-				<SocketContextProviderComponent>
-					<PointerBoard />
-					{children}
-				</SocketContextProviderComponent>
+				<ClerkProvider>{children}</ClerkProvider>
 			</body>
 		</html>
 	);

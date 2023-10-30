@@ -6,7 +6,7 @@ import { PiNavigationArrowFill } from 'react-icons/pi';
 export default function PointerBoardComponent() {
 	const { pointers } = useUserPointer();
 	return (
-		<div className="absolute bottom-0 left-0 right-0 top-0">
+		<div className="pointer-events-none absolute bottom-0 left-0 right-0 top-0">
 			{Object.entries(pointers).map(([uid, position]) => {
 				return (
 					<div
