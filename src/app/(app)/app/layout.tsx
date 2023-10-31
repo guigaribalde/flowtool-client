@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import SocketContextProviderComponent from '@/utils/contexts/SocketContext/Provider';
 import PointerBoard from '@/components/PointerBoard';
+import Navbar from '@/components/Navbar';
 
 export const metadata: Metadata = {
 	title: 'Create Next App',
@@ -13,9 +14,12 @@ export default function Layout({
 	children: React.ReactNode;
 }): React.ReactNode {
 	return (
-		<SocketContextProviderComponent>
-			<PointerBoard />
-			{children}
-		</SocketContextProviderComponent>
+		<div className="flex h-full w-full flex-col">
+			<Navbar />
+			<SocketContextProviderComponent>
+				<PointerBoard />
+				{children}
+			</SocketContextProviderComponent>
+		</div>
 	);
 }

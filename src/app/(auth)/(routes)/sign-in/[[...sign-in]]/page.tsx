@@ -54,12 +54,8 @@ export default function Page() {
 				});
 
 				if (result.status === 'complete') {
-					console.log(result);
 					await setActive({ session: result.createdSessionId });
-					router.push('/after-auth');
-				} else {
-					/* Investigate why the login hasn't completed */
-					console.log(result);
+					router.push('/app');
 				}
 			} catch (err: any) {
 				console.log(JSON.stringify(err, null, 2));
