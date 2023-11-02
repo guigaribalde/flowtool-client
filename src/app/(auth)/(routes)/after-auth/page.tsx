@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useClerk } from '@clerk/nextjs';
+import { type User } from '@prisma/client';
 
 export default function Page() {
 	const router = useRouter();
@@ -10,13 +11,15 @@ export default function Page() {
 
 	const getUser = async () => {
 		const response = await fetch('/api/after-auth');
-		const { user } = await response.json();
-		console.log({ user });
-		if (user) {
-			if (!user.companyId) return router.push('/app/setup');
-			return router.push('/app');
+		try {
+			const { user }: { user: User } = await response.json();
+			if (user) {
+				if (!user.spaceId) return router.push('/app?setup=true');
+				return router.push('/app');
+			}
+		} catch (e) {
+			return signOut();
 		}
-
 		return signOut();
 	};
 

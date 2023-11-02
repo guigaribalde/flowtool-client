@@ -19,18 +19,18 @@ model User {
   username  String
   status    Status?  @default(offline)
   socketId  String?
-  company   Company? @relation(fields: [companyId], references: [id])
-  companyId String?  @db.ObjectId
+  space   Space? @relation(fields: [spaceId], references: [id])
+  spaceId String?  @db.ObjectId
 }
 
 model InvitedUser {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   email     String   @unique
-  company   Company? @relation(fields: [companyId], references: [id])
-  companyId String?  @db.ObjectId
+  space   Space? @relation(fields: [spaceId], references: [id])
+  spaceId String?  @db.ObjectId
 }
 
-model Company {
+model Space {
   id          String        @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   users       User[]

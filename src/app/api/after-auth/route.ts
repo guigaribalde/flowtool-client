@@ -1,30 +1,35 @@
 /* eslint-disable import/prefer-default-export */
-import { currentUser as getClerkUser } from '@clerk/nextjs';
-import {
-	createUserIfNotExists,
-	getUser,
-} from '@prisma/controller/user.controller';
+import { currentUser as getClerkCurrentUser } from '@clerk/nextjs';
+import { User } from '@prisma/client';
+import prisma from '@prisma/prisma';
 
 export async function GET() {
-	const currentUser = await getClerkUser();
-	if (currentUser) {
-		const user = await createUserIfNotExists({
-			email: currentUser.emailAddresses[0].emailAddress,
-			clerkId: currentUser.id,
-			companyId: null,
+	const clerkCurrentUser = await getClerkCurrentUser();
+	if (clerkCurrentUser) {
+		const user: Omit<User, 'id'> = {
+			clerkId: clerkCurrentUser.id,
+			spaceId: null,
 			socketId: null,
+			email: clerkCurrentUser.emailAddresses[0].emailAddress,
+			username: clerkCurrentUser?.username || 'Anonymous',
 			status: 'online',
-			username: currentUser?.username || 'Anoniomo',
-		});
-		if (!user) {
-			try {
-				const existingUser = await getUser(currentUser.id);
-				return Response.json({ user: existingUser });
-			} catch (error) {
-				return Response.json({ user: null });
-			}
+		};
+
+		try {
+			const userDb = await prisma.user.upsert({
+				where: { clerkId: clerkCurrentUser.id },
+				update: user,
+				create: user,
+			});
+			console.log('userDb', userDb);
+			prisma.$disconnect();
+			return Response.json({ user: userDb });
+		} catch (e) {
+			return Response.json(
+				{},
+				{ status: 500, statusText: 'Unable to udpate or create user' },
+			);
 		}
-		return Response.json({ user });
 	}
-	return Response.json({ user: null });
+	return Response.json({}, { status: 401, statusText: 'Unauthorized' });
 }
