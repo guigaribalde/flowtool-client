@@ -8,8 +8,8 @@ import { useSignUp, useClerk, useSession } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
-import TextInput from '@/components/TextInput';
-import PasswordInput from '@/components/PasswordInput';
+import TextInput from '@components/forms/TextInput';
+import PasswordInput from '@components/forms/PasswordInput';
 
 interface Error {
 	code: string;

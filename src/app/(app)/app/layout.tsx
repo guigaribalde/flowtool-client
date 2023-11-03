@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import SocketContextProviderComponent from '@/utils/contexts/SocketContext/Provider';
-import PointerBoard from '@/components/PointerBoard';
-import Navbar from '@/components/Navbar';
+import PointerBoard from '@components/layout/core/PointerBoard';
+import Navbar from '@components/layout/ui/Navbar';
 
 export const metadata: Metadata = {
 	title: 'Create Next App',

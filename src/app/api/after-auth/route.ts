@@ -21,7 +21,6 @@ export async function GET() {
 				update: user,
 				create: user,
 			});
-			console.log('userDb', userDb);
 			prisma.$disconnect();
 			return Response.json({ user: userDb });
 		} catch (e) {

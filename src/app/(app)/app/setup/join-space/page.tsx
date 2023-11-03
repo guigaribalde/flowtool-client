@@ -1,6 +1,6 @@
 'use client';
 
-import TextInput from '@/components/TextInput';
+import TextInput from '@components/forms/TextInput';
 import { useFormik } from 'formik';
 import { useRouter } from 'next/navigation';
 import * as Yup from 'yup';

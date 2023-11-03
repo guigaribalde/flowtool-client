@@ -5,7 +5,7 @@
 import { useFormik } from 'formik';
 import { useSignUp } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
-import TextInput from '@/components/TextInput';
+import TextInput from '@components/forms/TextInput';
 
 interface Error {
 	code: string;
