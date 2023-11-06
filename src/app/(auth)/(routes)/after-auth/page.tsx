@@ -14,8 +14,7 @@ export default function Page() {
 		try {
 			const { user }: { user: User } = await response.json();
 			if (user) {
-				if (!user.spaceId) return router.push('/app?setup=true');
-				return router.push('/app');
+				return router.push('/h/spaces');
 			}
 		} catch (e) {
 			return signOut();

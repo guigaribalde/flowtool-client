@@ -55,7 +55,7 @@ export default function Page() {
 
 				if (result.status === 'complete') {
 					await setActive({ session: result.createdSessionId });
-					router.push('/app');
+					router.push('/h/spaces');
 				}
 			} catch (err: any) {
 				console.log(JSON.stringify(err, null, 2));

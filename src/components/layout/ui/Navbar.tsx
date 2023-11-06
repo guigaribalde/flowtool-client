@@ -2,8 +2,8 @@ import { UserButton } from '@clerk/nextjs';
 
 export default function Navbar() {
 	return (
-		<div className="fixed w-full border-b border-b-slate-300 bg-slate-50 p-3">
-			<div className="mx-auto flex max-w-5xl items-center justify-between">
+		<div className="w-full border-b border-b-slate-300 bg-slate-50 px-6 py-2">
+			<div className="mx-auto flex items-center justify-between">
 				<div className="flex items-center gap-5">
 					<span className="mr-5 text-lg font-semibold">Flow Tool</span>
 				</div>

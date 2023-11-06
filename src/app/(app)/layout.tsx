@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import SocketContextProviderComponent from '@/utils/contexts/SocketContext/Provider';
-import PointerBoard from '@components/layout/core/PointerBoard';
+// import SocketContextProviderComponent from '@/utils/contexts/SocketContext/Provider';
+// import PointerBoard from '@components/layout/core/PointerBoard';
 import Navbar from '@components/layout/ui/Navbar';
 
 export const metadata: Metadata = {
@@ -16,10 +16,10 @@ export default function Layout({
 	return (
 		<div className="flex h-full w-full flex-col">
 			<Navbar />
-			<SocketContextProviderComponent>
-				<PointerBoard />
-				{children}
-			</SocketContextProviderComponent>
+			{/* <SocketContextProviderComponent> */}
+			{/* <PointerBoard /> */}
+			{children}
+			{/* </SocketContextProviderComponent> */}
 		</div>
 	);
 }

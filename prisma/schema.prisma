@@ -12,27 +12,64 @@ enum Status {
   offline
 }
 
-model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  clerkId   String   @unique
-  email     String
-  username  String
-  status    Status?  @default(offline)
-  socketId  String?
-  space   Space? @relation(fields: [spaceId], references: [id])
-  spaceId String?  @db.ObjectId
+enum InviteStatus {
+  pending
+  accepted
+  declined
 }
 
-model InvitedUser {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  email     String   @unique
-  space   Space? @relation(fields: [spaceId], references: [id])
-  spaceId String?  @db.ObjectId
+enum UserRole {
+  admin
+  member
+  owner
+}
+
+model User {
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  clerkId         String            @unique
+  email           String
+  username        String
+  status          Status?           @default(offline)
+  socketId        String?
+  UserOnWorkSpace UserOnWorkSpace[]
 }
 
 model Space {
-  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
   name        String
-  users       User[]
-  InvitedUser InvitedUser[]
+  WorkSpace   WorkSpace @relation(fields: [workSpaceId], references: [id])
+  workSpaceId String    @db.ObjectId
 }
+
+model WorkSpace {
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  Space           Space[]
+  UserOnWorkSpace UserOnWorkSpace[]
+}
+
+model UserOnWorkSpace {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  workSpaceId String    @db.ObjectId
+  workSpace   WorkSpace @relation(fields: [workSpaceId], references: [id])
+  userId      String    @db.ObjectId
+  user        User      @relation(fields: [userId], references: [id])
+
+  userRole     UserRole     @default(member)
+  inviteStatus InviteStatus @default(pending)
+
+  @@unique([workSpaceId, userId])
+}
+
+// model Post {
+//   id          String     @id @default(auto()) @map("_id") @db.ObjectId
+//   categoryIDs String[]   @db.ObjectId
+//   categories  Category[] @relation(fields: [categoryIDs], references: [id])
+// }
+//
+// model Category {
+//   id      String   @id @default(auto()) @map("_id") @db.ObjectId
+//   name    String
+//   postIDs String[] @db.ObjectId
+//   posts   Post[]   @relation(fields: [postIDs], references: [id])
+// }
