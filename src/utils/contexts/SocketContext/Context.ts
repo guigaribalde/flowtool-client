@@ -22,7 +22,7 @@ export type TSocketContextActions =
 	| 'remove:user'
 	| 'update:context';
 
-export type TSocketContextPayload = string | string[] | Socket | Cursors;
+export type TSocketContextPayload = string | string[] | Socket;
 
 export interface ISocketContextActions {
 	type: TSocketContextActions;

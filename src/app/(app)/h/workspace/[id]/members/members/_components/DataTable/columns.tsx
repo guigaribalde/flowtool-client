@@ -12,18 +12,18 @@ import {
 	PiUserMinusBold,
 } from 'react-icons/pi';
 
-export type Payment = {
+export type User = {
 	id: string;
-	username: string;
 	email: string;
 	status: 'online' | 'offline' | null;
+	username: string;
 };
-const columnHelper = createColumnHelper<Payment>();
+const columnHelper = createColumnHelper<User>();
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<User>[] = [
 	{
 		accessorKey: 'username',
-		header: 'Nome de usuário',
+		header: 'Username',
 	},
 	{
 		accessorKey: 'email',

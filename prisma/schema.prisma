@@ -52,13 +52,13 @@ model UserOnWorkSpace {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   workSpaceId String    @db.ObjectId
   workSpace   WorkSpace @relation(fields: [workSpaceId], references: [id])
-  userId      String    @db.ObjectId
-  user        User      @relation(fields: [userId], references: [id])
+  userId      String?   @db.ObjectId
+  user        User?     @relation(fields: [userId], references: [id])
+
+  invitedUserEmail String?
 
   userRole     UserRole     @default(member)
   inviteStatus InviteStatus @default(pending)
-
-  @@unique([workSpaceId, userId])
 }
 
 // model Post {

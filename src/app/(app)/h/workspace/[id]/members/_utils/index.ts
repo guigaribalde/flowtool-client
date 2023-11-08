@@ -3,7 +3,7 @@ import { cache } from 'react';
 
 export const revalidate = 0; // seconds
 
-export const getWorkSpace = cache(async (id: string) => {
+export const getMembers = cache(async (id: string) => {
 	const workSpace = await prisma.workSpace.findUnique({
 		where: {
 			id,
@@ -22,6 +22,29 @@ export const getWorkSpace = cache(async (id: string) => {
 							status: true,
 						},
 					},
+				},
+			},
+		},
+	});
+	return workSpace;
+});
+
+export const getInvited = cache(async (id: string) => {
+	const workSpace = await prisma.workSpace.findUnique({
+		where: {
+			id,
+		},
+		include: {
+			UserOnWorkSpace: {
+				where: {
+					OR: [
+						{
+							inviteStatus: 'pending',
+						},
+						{
+							inviteStatus: 'declined',
+						},
+					],
 				},
 			},
 		},

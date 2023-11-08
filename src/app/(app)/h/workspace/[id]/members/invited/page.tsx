@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 
 import { User, columns } from './_components/DataTable/columns';
 import { DataTable } from './_components/DataTable/data-table';
-import { getMembers } from '../_utils';
+import { getInvited } from '../_utils';
 
 type PageParams = {
 	params: {
@@ -34,10 +34,10 @@ export default async function Page({ params }: PageParams) {
 	if (!user.UserOnWorkSpace.find((u) => u.workSpaceId === id))
 		return <div>Quadro nao encontrado</div>;
 
-	const workSpace = await getMembers(id);
+	const workSpace = await getInvited(id);
 
 	if (!workSpace) return <div>Erro</div>;
-	const users = workSpace.UserOnWorkSpace.flatMap((u) => u.user) as User[];
+	const users = workSpace.UserOnWorkSpace.flatMap((u) => u) as User[];
 
 	if (!users) return <div>Erro</div>;
 
