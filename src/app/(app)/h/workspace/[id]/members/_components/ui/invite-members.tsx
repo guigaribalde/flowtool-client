@@ -17,41 +17,51 @@ import TextInput from '@/components/forms/TextInput';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import { useToast } from '@components/ui/use-toast';
-
-type Props = {
-	workspaceId: string;
-};
+import { useEffect } from 'react';
+import { AxiosError } from 'axios';
+import useUsers from '../../_utils/hooks/useUsers';
 
 const validationSchema = Yup.object({
 	email: Yup.string().email('Email inválido').required('Campo obrigatório'),
 });
 
-export default function InviteMembers({ workspaceId }: Props) {
+export default function InviteMembers() {
 	const { toast } = useToast();
+	const { inviteMembersMutation } = useUsers();
+
 	const formik = useFormik({
 		initialValues: {
 			email: '',
 		},
 		validationSchema,
-		onSubmit: async (values, { resetForm }) => {
-			const response = await fetch(`/api/workspace/${workspaceId}/invite`, {
-				method: 'POST',
-				body: JSON.stringify(values),
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			});
+		onSubmit: async (values) => inviteMembersMutation.mutate(values),
+	});
 
-			const { message } = await response.json();
+	useEffect(() => {
+		const { isSuccess, isError, error, reset } = inviteMembersMutation;
+
+		if (isSuccess) {
+			toast({
+				title: 'Usuário convidado com sucesso',
+				description: `O usuário ${formik.values.email} foi convidado para a sua área de trabalho`,
+			});
+			reset();
+			formik.resetForm();
+		}
+
+		if (isError) {
+			const axiosError = error as AxiosError<{
+				message: 'ALREADY_INVITED_USER' | 'UNAUTHORIZED';
+			}>;
+
+			if (!axiosError?.response)
+				return console.log('axiosError?.response is undefined');
+			if (!axiosError?.response?.data)
+				return console.log('axiosError?.response?.data is undefined');
+
+			const { message } = axiosError!.response!.data;
 
 			switch (message) {
-				case 'INVITED_USER':
-					toast({
-						title: 'Usuário convidado com sucesso',
-						description: `O usuário ${values.email} foi convidado para a sua área de trabalho`,
-					});
-					resetForm();
-					break;
 				case 'ALREADY_INVITED_USER':
 					formik.setFieldError('email', 'Este usuário já foi convidado');
 					break;
@@ -59,11 +69,19 @@ export default function InviteMembers({ workspaceId }: Props) {
 					formik.setFieldError('email', 'Você não tem permissão para convidar');
 					break;
 				default:
-					resetForm();
+					toast({
+						title: 'Erro ao convidar usuário',
+						description: 'Tente novamente mais tarde',
+					});
 			}
-		},
-	});
+			reset();
+		}
+
+		return () => {};
+	}, [inviteMembersMutation]);
+
 	const emailError = formik.touched.email && formik.errors.email;
+
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
@@ -94,9 +112,9 @@ export default function InviteMembers({ workspaceId }: Props) {
 					className="btn btn-primary btn-sm w-full"
 					type="button"
 					onClick={() => formik.handleSubmit()}
-					disabled={formik.isSubmitting || formik.isValidating}
+					disabled={inviteMembersMutation.isPending}
 				>
-					{formik.isSubmitting || formik.isValidating ? (
+					{inviteMembersMutation.isPending ? (
 						<span className="loading loading-spinner" />
 					) : (
 						''

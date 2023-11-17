@@ -10,13 +10,11 @@ import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import {
 	PiDotsThreeOutlineVerticalFill,
 	PiUserMinusBold,
+	PiClockFill,
+	PiXCircleFill,
 } from 'react-icons/pi';
+import { User } from '../../../_utils/context/UsersContext';
 
-export type User = {
-	id: string;
-	invitedUserEmail: string;
-	inviteStatus: string;
-};
 const columnHelper = createColumnHelper<User>();
 
 export const columns: ColumnDef<User>[] = [
@@ -27,6 +25,27 @@ export const columns: ColumnDef<User>[] = [
 	{
 		accessorKey: 'inviteStatus',
 		header: 'Status',
+		cell: ({ row }) => {
+			const { inviteStatus } = row.original;
+
+			if (inviteStatus === 'pending')
+				return (
+					<div className="flex items-center gap-2 text-slate-500">
+						<PiClockFill />
+						<span>Pendente</span>
+					</div>
+				);
+
+			if (inviteStatus === 'declined')
+				return (
+					<div className="flex items-center gap-2 text-red-500">
+						<PiXCircleFill />
+						<span>Rejeitado</span>
+					</div>
+				);
+
+			return null;
+		},
 	},
 	columnHelper.display({
 		id: 'edit',

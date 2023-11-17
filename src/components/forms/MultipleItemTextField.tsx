@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/control-has-associated-label */
 import { useState } from 'react';
 import { PiPlus, PiX } from 'react-icons/pi';
 import * as Yup from 'yup';

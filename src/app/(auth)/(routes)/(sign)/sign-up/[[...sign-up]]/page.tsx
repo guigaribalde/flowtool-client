@@ -5,7 +5,7 @@
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useSignUp, useClerk, useSession } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
 import TextInput from '@components/forms/TextInput';
@@ -41,6 +41,8 @@ export default function Page() {
 	const { signOut, isReady } = useClerk();
 
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const invite = searchParams.get('invite');
 
 	const formik = useFormik({
 		initialValues: {
@@ -64,7 +66,7 @@ export default function Page() {
 					strategy: 'email_code',
 				});
 
-				router.push('/sign-up/verify');
+				router.push(`/sign-up/verify?invite=${invite}`);
 			} catch (err: any) {
 				// console.log(JSON.stringify(err, null, 2));
 				const errorResponse = err as ErrorResponse;

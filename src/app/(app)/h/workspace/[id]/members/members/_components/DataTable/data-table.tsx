@@ -2,33 +2,36 @@
 
 import {
 	ColumnDef,
-	flexRender,
 	getCoreRowModel,
 	getPaginationRowModel,
 	useReactTable,
 } from '@tanstack/react-table';
 
-import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from '@components/ui/table';
-import { useState } from 'react';
-import { DataTablePagination } from './pagination-datatable';
+import { useMemo } from 'react';
+import { DefaultDataTable } from '@/components/ui/default-data-table';
+import useCurrentUser from '@/app/(app)/_utils/hooks/useCurrentUser';
+import useUsers from '../../../_utils/hooks/useUsers';
+import { User } from '../../../_utils/context/UsersContext';
 
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[];
-	data: TData[];
+	workspaceId: string;
 }
 
 export function DataTable<TData, TValue>({
 	columns,
-	data: outterData,
+	workspaceId,
 }: DataTableProps<TData, TValue>) {
-	const [data, setData] = useState(outterData);
+	const { deleteInvitationMutation, query } = useUsers();
+	const { users } = query.data as { users: User[] };
+	const currentUser = useCurrentUser();
+
+	const data = useMemo(() => {
+		return users.filter((user: User) => {
+			return user.inviteStatus === 'accepted';
+		});
+	}, [query.data]) as TData[];
+
 	const table = useReactTable({
 		data,
 		columns,
@@ -36,69 +39,14 @@ export function DataTable<TData, TValue>({
 		getPaginationRowModel: getPaginationRowModel(),
 		meta: {
 			removeUser: (id: string) => {
-				setData((prev) => {
-					const old = prev as any[];
-					return old.filter((item) => item.id !== id);
-				});
+				deleteInvitationMutation.mutate({ userId: id });
 			},
+			getCurrentUser: () => {
+				return currentUser;
+			},
+			workspaceId,
 		},
 	});
 
-	return (
-		<div>
-			<div className="rounded-md border">
-				<Table>
-					<TableHeader>
-						{table.getHeaderGroups().map((headerGroup) => (
-							<TableRow key={headerGroup.id}>
-								{headerGroup.headers.map((header) => {
-									return (
-										<TableHead key={header.id}>
-											{header.isPlaceholder
-												? null
-												: flexRender(
-														header.column.columnDef.header,
-														header.getContext(),
-												  )}
-										</TableHead>
-									);
-								})}
-							</TableRow>
-						))}
-					</TableHeader>
-					<TableBody>
-						{table.getRowModel().rows?.length ? (
-							table.getRowModel().rows.map((row) => (
-								<TableRow
-									key={row.id}
-									data-state={row.getIsSelected() && 'selected'}
-								>
-									{row.getVisibleCells().map((cell) => (
-										<TableCell key={cell.id}>
-											{flexRender(
-												cell.column.columnDef.cell,
-												cell.getContext(),
-											)}
-										</TableCell>
-									))}
-								</TableRow>
-							))
-						) : (
-							<TableRow>
-								<TableCell
-									colSpan={columns.length}
-									className="h-24 text-center"
-								>
-									Sem dados
-								</TableCell>
-							</TableRow>
-						)}
-					</TableBody>
-				</Table>
-			</div>
-			<div className="mt-2">
-				<DataTablePagination table={table} />
-			</div>
-		</div>
-	);
+	return <DefaultDataTable table={table} columnsLength={columns.length} />;
 }

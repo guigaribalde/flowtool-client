@@ -2,9 +2,7 @@ import prisma from '@prisma/prisma';
 import { currentUser as getClerkCurrentUser } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 
-import { User, columns } from './_components/DataTable/columns';
-import { DataTable } from './_components/DataTable/data-table';
-import { getInvited } from '../_utils';
+import DataTable from './_components/DataTable';
 
 type PageParams = {
 	params: {
@@ -13,7 +11,7 @@ type PageParams = {
 };
 
 export default async function Page({ params }: PageParams) {
-	const { id } = params;
+	const { id: workspaceId } = params;
 	const currentUser = await getClerkCurrentUser();
 	if (!currentUser) return redirect('/sign-in');
 
@@ -29,21 +27,11 @@ export default async function Page({ params }: PageParams) {
 			},
 		},
 	});
+	await prisma.$disconnect();
 
 	if (!user) return <div>Erro</div>;
-	if (!user.UserOnWorkSpace.find((u) => u.workSpaceId === id))
+	if (!user.UserOnWorkSpace.find((u) => u.workSpaceId === workspaceId))
 		return <div>Quadro nao encontrado</div>;
 
-	const workSpace = await getInvited(id);
-
-	if (!workSpace) return <div>Erro</div>;
-	const users = workSpace.UserOnWorkSpace.flatMap((u) => u) as User[];
-
-	if (!users) return <div>Erro</div>;
-
-	return (
-		<div className="mt-2">
-			<DataTable columns={columns} data={users} />
-		</div>
-	);
+	return <DataTable />;
 }

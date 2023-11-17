@@ -11,5 +11,4 @@ function debounce<Params extends any[]>(
 	};
 }
 
-// eslint-disable-next-line
 export { debounce };

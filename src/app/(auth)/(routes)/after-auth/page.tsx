@@ -1,16 +1,18 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useClerk } from '@clerk/nextjs';
 import { type User } from '@prisma/client';
 
 export default function Page() {
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const invite = searchParams.get('invite');
 	const { signOut } = useClerk();
 
 	const getUser = async () => {
-		const response = await fetch('/api/after-auth');
+		const response = await fetch(`/api/after-auth?invite=${invite}`);
 		try {
 			const { user }: { user: User } = await response.json();
 			if (user) {

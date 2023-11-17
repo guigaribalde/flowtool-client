@@ -19,9 +19,11 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
       "@components/*": ["./src/components/*"],
-      "@prisma/*": ["./prisma/*"]
+      "@actions/*": ["./src/actions/*"],
+      "@prisma/*": ["./prisma/*"],
+      "@auth/*": ["./src/auth/*"],
+      "@/*": ["./src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

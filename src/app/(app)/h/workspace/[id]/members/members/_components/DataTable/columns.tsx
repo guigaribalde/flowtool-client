@@ -11,39 +11,54 @@ import {
 	PiDotsThreeOutlineVerticalFill,
 	PiUserMinusBold,
 } from 'react-icons/pi';
+import { TUser } from '@/app/(app)/_utils/context/CurrentUserContext';
+import { User } from '../../../_utils/context/UsersContext';
 
-export type User = {
-	id: string;
-	email: string;
-	status: 'online' | 'offline' | null;
-	username: string;
-};
 const columnHelper = createColumnHelper<User>();
 
 export const columns: ColumnDef<User>[] = [
 	{
 		accessorKey: 'username',
-		header: 'Username',
+		header: 'Nome',
+		cell: ({ row }) => {
+			const { username } = row.original;
+			return <span className="capitalize">{username}</span>;
+		},
 	},
 	{
 		accessorKey: 'email',
 		header: 'Email',
 	},
 	{
-		accessorKey: 'status',
-		header: 'Status',
+		accessorKey: 'userRole',
+		header: 'Cargo',
 		cell: ({ row }) => {
-			const { status } = row.original;
-			return (
-				<div className="flex items-center gap-2">
-					<div
-						className={`h-2 w-2 rounded-full ${
-							status === 'online' ? 'bg-green-500' : 'bg-slate-500'
-						}`}
-					/>
-					<span>{status}</span>
-				</div>
-			);
+			const { userRole } = row.original;
+			if (userRole === 'owner')
+				return (
+					<div className="flex items-center gap-2 text-blue-600">
+						<span className="h-2 w-2 rounded-full bg-blue-600" />
+						<span>Dono</span>
+					</div>
+				);
+
+			if (userRole === 'admin')
+				return (
+					<div className="flex items-center gap-2 text-green-600">
+						<span className="h-2 w-2 rounded-full bg-green-600" />
+						<span>Admin</span>
+					</div>
+				);
+
+			if (userRole === 'member')
+				return (
+					<div className="flex items-center gap-2 text-gray-500">
+						<span className="h-2 w-2 rounded-full bg-gray-500" />
+						<span>Membro</span>
+					</div>
+				);
+
+			return null;
 		},
 	},
 	columnHelper.display({
@@ -53,10 +68,25 @@ export const columns: ColumnDef<User>[] = [
 			if (!meta) return null;
 
 			const { id } = row.original;
-			const { removeUser } = meta as {
+
+			const { removeUser, getCurrentUser, workspaceId } = meta as {
 				removeUser: (id: string) => void;
-				changePermission: (id: string) => void;
+				getCurrentUser: () => { user: TUser };
+				workspaceId: string;
 			};
+
+			const currentUser = getCurrentUser().user;
+			const currentUserOnSpace = currentUser.UserOnWorkSpace.find(
+				(uowp) =>
+					uowp.userId === currentUser.id && uowp.workSpaceId === workspaceId,
+			);
+			const isCurrentUser = currentUserOnSpace?.id === id;
+
+			const isAdmin =
+				currentUserOnSpace?.userRole === 'admin' ||
+				currentUserOnSpace?.userRole === 'owner';
+
+			if (isCurrentUser || !isAdmin) return null;
 
 			return (
 				<div className="flex w-full justify-end">

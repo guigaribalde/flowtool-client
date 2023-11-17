@@ -4,7 +4,7 @@
 
 import { useFormik } from 'formik';
 import { useSignUp } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import TextInput from '@components/forms/TextInput';
 
 interface Error {
@@ -23,7 +23,11 @@ interface ErrorResponse {
 
 export default function Page() {
 	const { isLoaded, signUp, setActive } = useSignUp();
+
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const invite = searchParams.get('invite');
+
 	const formik = useFormik({
 		initialValues: {
 			code: '',
@@ -41,7 +45,7 @@ export default function Page() {
 				}
 				if (completeSignUp.status === 'complete') {
 					await setActive({ session: completeSignUp.createdSessionId });
-					router.push('/after-auth');
+					router.push(`/after-auth?invite=${invite}`);
 				}
 			} catch (err: any) {
 				// console.log(JSON.stringify(err, null, 2));
