@@ -10,5 +10,11 @@ function debounce<Params extends any[]>(
 		}, timeout);
 	};
 }
+const ObjectId = (
+	m = Math,
+	d = Date,
+	h = 16,
+	s = (i: any) => m.floor(i).toString(h),
+) => s(d.now() / 1000) + ' '.repeat(h).replace(/./g, () => s(m.random() * h));
 
-export { debounce };
+export { debounce, ObjectId };

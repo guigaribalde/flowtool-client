@@ -1,7 +1,6 @@
 import { currentUser } from '@auth/index';
 import { auth } from '@clerk/nextjs';
 import type { Metadata } from 'next';
-import Navbar from '@components/layout/ui/Navbar';
 import prisma from '@prisma/prisma';
 import { redirect } from 'next/navigation';
 import { Providers } from './providers';
@@ -48,10 +47,7 @@ export default async function Layout({
 
 	return (
 		<div className="flex h-full w-full flex-col">
-			<Providers currentUser={user || ({} as TUser)}>
-				<Navbar username={temp.username} />
-				{children}
-			</Providers>
+			<Providers currentUser={user || ({} as TUser)}>{children}</Providers>
 		</div>
 	);
 }

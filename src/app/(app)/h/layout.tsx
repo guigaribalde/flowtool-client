@@ -16,6 +16,7 @@ import axios from 'axios';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { WorkSpace } from '@prisma/client';
+import Navbar from '@components/layout/ui/Navbar';
 import Spaces from './_components/Spaces';
 import Workspaces from './_components/Workspaces';
 import useCurrentUser from '../_utils/hooks/useCurrentUser';
@@ -63,59 +64,63 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 	const nameError = formik.errors.name && formik.touched.name;
 
 	return (
-		<div className="mx-auto mt-5 flex w-full max-w-5xl gap-5 p-5">
-			<div className="flex w-full max-w-[256px] flex-col gap-3">
-				<div className="flex flex-col gap-1">
-					<Spaces />
-				</div>
-				<hr />
-				<div className="flex flex-col items-center gap-2">
-					<div className="flex w-full items-center justify-between pl-3 text-xs font-semibold text-slate-700">
-						<span>Áreas de trabalho</span>
+		<>
+			<Navbar username={user?.username} />
+			<div className="mx-auto mt-5 flex w-full max-w-5xl gap-5 p-5">
+				<div className="flex w-full max-w-[256px] flex-col gap-3">
+					<div className="flex flex-col gap-1">
+						<Spaces />
+					</div>
+					<hr />
+					<div className="flex flex-col items-center gap-2">
+						<div className="flex w-full items-center justify-between pl-3 text-xs font-semibold text-slate-700">
+							<span>Áreas de trabalho</span>
 
-						<Dialog>
-							<DialogTrigger asChild>
-								<button className="btn btn-ghost btn-sm" type="button">
-									<PiPlus />
-								</button>
-							</DialogTrigger>
-							<DialogContent>
-								<DialogHeader>
-									<DialogTitle>Criar nova área de trabalho</DialogTitle>
-									<DialogDescription>
-										Crie uma nova área de trabalho inserindo o nome dele abaixo.
-									</DialogDescription>
-								</DialogHeader>
-								<TextInput
-									label="Nome"
-									type="name"
-									name="name"
-									placeholder="Nome da sua área de trabalho"
-									onChange={formik.handleChange}
-									onBlur={formik.handleBlur}
-									value={formik.values.name}
-									error={nameError}
-								/>
-								<button
-									className="btn btn-primary btn-sm w-full"
-									type="button"
-									disabled={formik.isSubmitting || formik.isValidating}
-									onClick={() => formik.handleSubmit()}
-								>
-									{(formik.isSubmitting || formik.isValidating) && (
-										<span className="loading loading-spinner" />
-									)}
-									Criar
-								</button>
-							</DialogContent>
-						</Dialog>
-					</div>
-					<div className="flex w-full">
-						<Workspaces workspaces={workSpaces} />
+							<Dialog>
+								<DialogTrigger asChild>
+									<button className="btn btn-ghost btn-sm" type="button">
+										<PiPlus />
+									</button>
+								</DialogTrigger>
+								<DialogContent>
+									<DialogHeader>
+										<DialogTitle>Criar nova área de trabalho</DialogTitle>
+										<DialogDescription>
+											Crie uma nova área de trabalho inserindo o nome dele
+											abaixo.
+										</DialogDescription>
+									</DialogHeader>
+									<TextInput
+										label="Nome"
+										type="name"
+										name="name"
+										placeholder="Nome da sua área de trabalho"
+										onChange={formik.handleChange}
+										onBlur={formik.handleBlur}
+										value={formik.values.name}
+										error={nameError}
+									/>
+									<button
+										className="btn btn-primary btn-sm w-full"
+										type="button"
+										disabled={formik.isSubmitting || formik.isValidating}
+										onClick={() => formik.handleSubmit()}
+									>
+										{(formik.isSubmitting || formik.isValidating) && (
+											<span className="loading loading-spinner" />
+										)}
+										Criar
+									</button>
+								</DialogContent>
+							</Dialog>
+						</div>
+						<div className="flex w-full">
+							<Workspaces workspaces={workSpaces} />
+						</div>
 					</div>
 				</div>
+				{children}
 			</div>
-			{children}
-		</div>
+		</>
 	);
 }

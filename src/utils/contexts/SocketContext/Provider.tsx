@@ -3,20 +3,27 @@
 import useSocket from '@/utils/hooks/useSocket';
 import { useEffect, useReducer } from 'react';
 import { URI } from '@/utils/constants';
+import { useAuth } from '@clerk/nextjs';
+import useCurrentUser from '@/app/(app)/_utils/hooks/useCurrentUser';
+import { User } from '@prisma/client';
 import {
 	SocketContextProvider,
 	SocketReducer,
-	defaultScoketContextState,
+	defaultSocketContextState,
 } from './Context';
 
 export default function SocketContextProviderComponent({
 	children,
+	spaceId,
 }: {
 	children: React.ReactNode;
+	spaceId: string;
 }) {
+	const { getToken } = useAuth();
+	const { user } = useCurrentUser();
 	const [SocketState, SocketDispatch] = useReducer(
 		SocketReducer,
-		defaultScoketContextState,
+		defaultSocketContextState,
 	);
 	const socket = useSocket(URI, {
 		reconnectionAttempts: 5,
@@ -25,12 +32,9 @@ export default function SocketContextProviderComponent({
 	});
 
 	const StartListeners = () => {
-		socket.on('user_connected', (users: string[]) => {
+		socket.on('update:users', (users: User[]) => {
+			console.log(users);
 			SocketDispatch({ type: 'update:users', payload: users });
-		});
-
-		socket.on('user_disconnected', (uid: string) => {
-			SocketDispatch({ type: 'remove:user', payload: uid });
 		});
 
 		socket.io.on('reconnect', (attempt: number) => {
@@ -51,18 +55,26 @@ export default function SocketContextProviderComponent({
 	};
 
 	const SendHandshake = () => {
-		const callback = (uid: string, users: string[]) => {
+		const callback = (uid: string, users: User[]) => {
+			console.log(uid, users);
 			SocketDispatch({ type: 'update:uid', payload: uid });
 			SocketDispatch({ type: 'update:users', payload: users });
 		};
-		socket.emit('handshake', callback);
+		socket.emit('user:handshake', { spaceId, userId: user.id }, callback);
 	};
 
 	useEffect(() => {
-		socket.connect();
-		SocketDispatch({ type: 'update:socket', payload: socket });
-		StartListeners();
-		SendHandshake();
+		const token = async () => {
+			const t = await getToken();
+			socket.auth = { token: t };
+
+			socket.connect();
+			SocketDispatch({ type: 'update:socket', payload: socket });
+
+			StartListeners();
+			SendHandshake();
+		};
+		token();
 	}, []);
 
 	return (

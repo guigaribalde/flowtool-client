@@ -14,7 +14,8 @@ export default function PointerBoardComponent() {
 						style={{
 							left: position.x,
 							top: position.y,
-							transform: 'translate(0%, 0%)',
+							transform: 'translate(-2%, 0%)',
+							zIndex: 9999,
 						}}
 						key={uid}
 					>

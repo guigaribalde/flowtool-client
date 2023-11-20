@@ -5,6 +5,14 @@
 
 import { Droppable } from 'react-beautiful-dnd';
 import { PiDotsThreeOutlineFill, PiPlusBold } from 'react-icons/pi';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useBoolean } from 'usehooks-ts';
+import QuickCreateCard from './quick-create-card';
 
 interface BoardColumnProps {
 	children: React.ReactNode;
@@ -13,17 +21,34 @@ interface BoardColumnProps {
 }
 
 export function BoardColumn({ children, id, name }: BoardColumnProps) {
+	const { value, setTrue, setFalse, toggle } = useBoolean(false);
+
 	return (
-		<div className="flex h-full w-[320px] flex-col gap-4">
+		<div className="flex h-full w-[320px] flex-col gap-6">
 			<div className="flex items-center justify-between rounded-lg border-[1px] border-slate-200 bg-white px-4 py-2 shadow-md">
 				<h3 className="flex items-center gap-1 text-sm font-medium">{name}</h3>
 				<div className="flex items-center gap-1 text-slate-500">
-					<button type="button" className="btn btn-ghost btn-sm px-2">
+					<button
+						onClick={setTrue}
+						type="button"
+						className="btn btn-ghost btn-sm px-2"
+					>
 						<PiPlusBold />
 					</button>
-					<button type="button" className="btn btn-ghost btn-sm px-2">
-						<PiDotsThreeOutlineFill />
-					</button>
+
+					<DropdownMenu>
+						<DropdownMenuTrigger>
+							<PiDotsThreeOutlineFill />
+						</DropdownMenuTrigger>
+						<DropdownMenuContent side="bottom" align="end">
+							<DropdownMenuItem
+								onClick={() => {}}
+								className="flex cursor-pointer items-center gap-2"
+							>
+								<span>Sair</span>
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 			</div>
 			<Droppable droppableId={id}>
@@ -40,6 +65,7 @@ export function BoardColumn({ children, id, name }: BoardColumnProps) {
 							}}
 						>
 							{children}
+							{value && <QuickCreateCard columnId={id} setFalse={setFalse} />}
 						</div>
 					);
 				}}

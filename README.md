@@ -1,7 +1,13 @@
 Todo:
+    Column:
+    - [] Delete column
+    - [] Rename column
+    - [] Done type column
 
-- [x] Create store to store current user
-- [x] Create Spaces
-- [x] Create Workspace
-- [x] Send email on member invite
-- [x] Setup guest account
+    Task:
+    - [] Reorder tasks
+    - [] Delete task
+
+    TopBar:
+    - [X] Breadcrumb
+    - [] Create task

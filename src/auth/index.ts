@@ -43,6 +43,41 @@ const isOnWorkSpace = async (workSpaceId: string) => {
 	return !!user;
 };
 
+const isOnSpace = async (spaceId: string) => {
+	const { userId } = auth();
+
+	if (!userId) return false;
+
+	const workspace = await prisma.workSpace.findFirst({
+		where: {
+			Space: {
+				some: {
+					id: spaceId,
+				},
+			},
+		},
+		include: {
+			Space: true,
+			UserOnWorkSpace: {
+				where: {
+					user: {
+						clerkId: userId,
+					},
+				},
+				include: {
+					user: true,
+				},
+			},
+		},
+	});
+
+	if (!workspace) return false;
+
+	if (!workspace.UserOnWorkSpace.length) return false;
+
+	return !!workspace.UserOnWorkSpace[0].user?.id;
+};
+
 const currentUser = async () => {
 	const { userId } = auth();
 
@@ -59,4 +94,4 @@ const currentUser = async () => {
 	return user;
 };
 
-export { isAdmin, isOnWorkSpace, currentUser };
+export { isOnSpace, isAdmin, isOnWorkSpace, currentUser };

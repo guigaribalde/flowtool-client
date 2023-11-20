@@ -1,14 +1,15 @@
 import { type Socket } from 'socket.io-client';
 import { createContext } from 'react';
+import { User } from '@prisma/client';
 
 export interface ISocketContextState {
 	socket: Socket | undefined;
 	uid: string;
-	users: string[];
+	users: User[];
 	context: string;
 }
 
-export const defaultScoketContextState: ISocketContextState = {
+export const defaultSocketContextState: ISocketContextState = {
 	socket: undefined,
 	uid: '',
 	users: [],
@@ -18,11 +19,9 @@ export const defaultScoketContextState: ISocketContextState = {
 export type TSocketContextActions =
 	| 'update:socket'
 	| 'update:uid'
-	| 'update:users'
-	| 'remove:user'
-	| 'update:context';
+	| 'update:users';
 
-export type TSocketContextPayload = string | string[] | Socket;
+export type TSocketContextPayload = string | User[] | Socket;
 
 export interface ISocketContextActions {
 	type: TSocketContextActions;
@@ -33,8 +32,6 @@ export const SocketReducer = (
 	state: ISocketContextState,
 	action: ISocketContextActions,
 ): ISocketContextState => {
-	console.info(`Message Received: ${action.type} - Payload:`, action.payload);
-
 	switch (action.type) {
 		case 'update:socket':
 			return {
@@ -49,17 +46,7 @@ export const SocketReducer = (
 		case 'update:users':
 			return {
 				...state,
-				users: action.payload as string[],
-			};
-		case 'remove:user':
-			return {
-				...state,
-				users: state.users.filter((user) => user !== action.payload),
-			};
-		case 'update:context':
-			return {
-				...state,
-				context: action.payload as string,
+				users: action.payload as User[],
 			};
 		default:
 			return state;
@@ -72,7 +59,7 @@ export interface ISocketContextProps {
 }
 
 const SocketContext = createContext<ISocketContextProps>({
-	SocketState: defaultScoketContextState,
+	SocketState: defaultSocketContextState,
 	SocketDispatch: () => {},
 });
 
