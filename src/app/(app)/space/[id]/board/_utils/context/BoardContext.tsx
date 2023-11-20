@@ -16,6 +16,7 @@ import {
 	SetStateAction,
 	createContext,
 	useContext,
+	useEffect,
 	useState,
 } from 'react';
 import { toast } from '@/components/ui/use-toast';
@@ -73,6 +74,7 @@ export type TColumn = {
 export interface BoardContextState {
 	query: UseQueryResult<TBoard, Error>;
 	createColumn: (payload: CreateColumnPayload) => void;
+	board: TBoard;
 
 	createTask: UseMutationResult<
 		AxiosResponse<any, any>,
@@ -118,9 +120,42 @@ export default function BoardContextProvider({
 		initialData,
 	});
 
+	const [board, setBoard] = useState<TBoard>(initialData);
+
 	const createColumn = (payload: CreateColumnPayload) => {
 		SocketState.socket?.emit('create:column', { ...payload, spaceId });
+		setBoard((oldBoard) => {
+			const newBoard = {
+				...oldBoard,
+				columns: [...(oldBoard?.columns || []), payload],
+			} as TBoard;
+
+			return newBoard;
+		});
 	};
+
+	type CreateColumnResponse = {
+		id: string;
+		name: string;
+		index: number;
+		boardId: string | null;
+	};
+	const StartListners = () => {
+		SocketState.socket?.on('create:column', (payload: CreateColumnResponse) => {
+			setBoard((oldBoard) => {
+				const newBoard = {
+					...oldBoard,
+					columns: [...(oldBoard?.columns || []), { ...payload, tasks: [] }],
+				} as TBoard;
+
+				return newBoard;
+			});
+		});
+	};
+
+	useEffect(() => {
+		if (SocketState.socket) StartListners();
+	}, [SocketState.socket]);
 
 	// const createColumn = useMutation({
 	// 	mutationFn: async (payload: CreateColumnPayload) => {
@@ -306,6 +341,7 @@ export default function BoardContextProvider({
 	return (
 		<BoardContext.Provider
 			value={{
+				board,
 				createColumn,
 				updateTasksColumn,
 				query,

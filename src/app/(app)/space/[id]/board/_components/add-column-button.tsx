@@ -17,8 +17,8 @@ export default function AddColumnButton({ spaceId }: AddColumnButtonProps) {
 	const { SocketState, SocketDispatch } = useContext(SocketContext);
 	const ref = useRef<HTMLFormElement>(null);
 
-	const { query, createColumn } = useBoard();
-	const columns = query.data?.columns || [];
+	const { board, createColumn } = useBoard();
+	const columns = board?.columns || [];
 
 	const handleClose = () => {
 		setIsAddingColumn(false);

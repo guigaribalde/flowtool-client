@@ -66,8 +66,8 @@ interface BoardProps {
 
 export default function Board({ spaceId }: BoardProps) {
 	resetServerContext();
-	const { query, setColumns, updateTasksOrder, updateTasksColumn } = useBoard();
-	const columns = query.data?.columns || [];
+	const { board, setColumns, updateTasksOrder, updateTasksColumn } = useBoard();
+	const columns = board?.columns || [];
 
 	return (
 		<>
