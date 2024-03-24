@@ -4,8 +4,8 @@ import useSocket from '@/utils/hooks/useSocket';
 import { useEffect, useReducer } from 'react';
 import { URI } from '@/utils/constants';
 import { useAuth } from '@clerk/nextjs';
-import useCurrentUser from '@/app/(app)/_utils/hooks/useCurrentUser';
 import { User } from '@prisma/client';
+import { useAppMetadata } from '@/stores/app-metadata/app-metadata';
 import {
 	SocketContextProvider,
 	SocketReducer,
@@ -20,7 +20,7 @@ export default function SocketContextProviderComponent({
 	spaceId: string;
 }) {
 	const { getToken } = useAuth();
-	const { user } = useCurrentUser();
+	const user = useAppMetadata((state) => state.user);
 	const [SocketState, SocketDispatch] = useReducer(
 		SocketReducer,
 		defaultSocketContextState,
@@ -29,6 +29,14 @@ export default function SocketContextProviderComponent({
 		reconnectionAttempts: 5,
 		reconnectionDelay: 5000,
 		autoConnect: false,
+		auth: async (cb) => {
+			cb({
+				token: await getToken({
+					template: 'teste',
+					leewayInSeconds: 60 * 60 * 24 * 30, // 30 days
+				}),
+			});
+		},
 	});
 
 	const StartListeners = () => {
@@ -52,6 +60,13 @@ export default function SocketContextProviderComponent({
 		socket.io.on('reconnect_failed', () => {
 			console.info(`Failed to reconnect`);
 		});
+
+		socket.on('connect', () => {
+			console.log('we are connected!');
+		});
+		socket.on('disconnect', (reason) => {
+			console.log('we are disconnected!', reason);
+		});
 	};
 
 	const SendHandshake = () => {
@@ -65,8 +80,8 @@ export default function SocketContextProviderComponent({
 
 	useEffect(() => {
 		const token = async () => {
-			const t = await getToken();
-			socket.auth = { token: t };
+			// const t = await getToken();
+			// socket.auth = { token: t };
 
 			socket.connect();
 			SocketDispatch({ type: 'update:socket', payload: socket });

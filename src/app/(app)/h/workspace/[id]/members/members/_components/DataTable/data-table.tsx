@@ -9,7 +9,6 @@ import {
 
 import { useMemo } from 'react';
 import { DefaultDataTable } from '@/components/ui/default-data-table';
-import useCurrentUser from '@/app/(app)/_utils/hooks/useCurrentUser';
 import useUsers from '../../../_utils/hooks/useUsers';
 import { User } from '../../../_utils/context/UsersContext';
 
@@ -24,7 +23,6 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
 	const { deleteInvitationMutation, query } = useUsers();
 	const { users } = query.data as { users: User[] };
-	const currentUser = useCurrentUser();
 
 	const data = useMemo(() => {
 		return users.filter((user: User) => {
@@ -40,9 +38,6 @@ export function DataTable<TData, TValue>({
 		meta: {
 			removeUser: (id: string) => {
 				deleteInvitationMutation.mutate({ userId: id });
-			},
-			getCurrentUser: () => {
-				return currentUser;
 			},
 			workspaceId,
 		},

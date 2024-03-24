@@ -37,7 +37,7 @@ model User {
 model Space {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   name        String
-  WorkSpace   WorkSpace @relation(fields: [workSpaceId], references: [id])
+  WorkSpace   WorkSpace @relation(fields: [workSpaceId], references: [id], onDelete: Cascade)
   workSpaceId String    @db.ObjectId
 
   boards Board[]
@@ -53,9 +53,9 @@ model WorkSpace {
 model UserOnWorkSpace {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   workSpaceId String    @db.ObjectId
-  workSpace   WorkSpace @relation(fields: [workSpaceId], references: [id])
+  workSpace   WorkSpace @relation(fields: [workSpaceId], references: [id], onDelete: Cascade)
   userId      String?   @db.ObjectId
-  user        User?     @relation(fields: [userId], references: [id])
+  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   invitedUserEmail String?
 
@@ -68,7 +68,7 @@ model Board {
   name    String
   columns Column[]
 
-  Space   Space?  @relation(fields: [spaceId], references: [id])
+  Space   Space?  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   spaceId String? @db.ObjectId
 }
 
@@ -79,7 +79,7 @@ model Column {
 
   tasks Task[]
 
-  Board   Board?  @relation(fields: [boardId], references: [id])
+  Board   Board?  @relation(fields: [boardId], references: [id], onDelete: Cascade)
   boardId String? @db.ObjectId
 }
 
@@ -88,6 +88,6 @@ model Task {
   name  String
   index Int
 
-  Column   Column? @relation(fields: [columnId], references: [id])
+  Column   Column? @relation(fields: [columnId], references: [id], onDelete: Cascade)
   columnId String? @db.ObjectId
 }

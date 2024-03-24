@@ -6,21 +6,19 @@ import {
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@components/ui/dropdown-menu';
 import Image from 'next/image';
 import Link from 'next/link';
 import SocketContext, {
 	SocketReducer,
 	defaultSocketContextState,
 } from '@/utils/contexts/SocketContext/Context';
-import { useContext, useReducer } from 'react';
-import Logo from '../../../../public/logo-black-small.svg';
+import { useContext, useEffect, useReducer } from 'react';
+import Logo from '@public/logo-black-small.svg';
 
 export default function Navbar({ username }: { username: string }) {
 	const { signOut } = useClerk();
 	const { SocketState } = useContext(SocketContext);
-
-	console.log(SocketState?.users);
 
 	const connectedUsers =
 		SocketState?.users?.filter((user) => user.id !== SocketState?.uid) || [];
@@ -57,7 +55,9 @@ export default function Navbar({ username }: { username: string }) {
 							<DropdownMenuTrigger>
 								<div className="avatar placeholder cursor-pointer">
 									<div className="w-8 rounded-full bg-neutral text-neutral-content">
-										<span className="text-md">{username[0].toUpperCase()}</span>
+										<span className="text-md">
+											{username?.length ? username[0].toUpperCase() : '?'}
+										</span>
 									</div>
 								</div>
 							</DropdownMenuTrigger>

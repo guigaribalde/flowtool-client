@@ -5,7 +5,6 @@ import { useState, useRef, useContext } from 'react';
 import { PiCheckBold, PiPlusBold, PiXBold } from 'react-icons/pi';
 import { useOnClickOutside } from 'usehooks-ts';
 import { ObjectId } from '@/utils/utils';
-import SocketContext from '@/utils/contexts/SocketContext/Context';
 import useBoard from '../_utils/hooks/useBoard';
 
 interface AddColumnButtonProps {
@@ -14,7 +13,6 @@ interface AddColumnButtonProps {
 
 export default function AddColumnButton({ spaceId }: AddColumnButtonProps) {
 	const [isAddingColumn, setIsAddingColumn] = useState(false);
-	const { SocketState, SocketDispatch } = useContext(SocketContext);
 	const ref = useRef<HTMLFormElement>(null);
 
 	const { board, createColumn } = useBoard();
@@ -39,11 +37,6 @@ export default function AddColumnButton({ spaceId }: AddColumnButtonProps) {
 
 		createColumn(payload);
 		setIsAddingColumn(false);
-
-		// createColumn.mutate({
-		// 	...payload,
-		// 	spaceId,
-		// });
 	};
 
 	useOnClickOutside(ref, () => {

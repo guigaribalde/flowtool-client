@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo } from 'react';
 import io, {
 	type ManagerOptions,
 	type SocketOptions,
@@ -9,7 +9,7 @@ export default function useSocket(
 	uri: string,
 	opts: Partial<ManagerOptions & SocketOptions> | undefined,
 ): Socket {
-	const { current: socket } = useRef(io(uri, opts));
+	const socket = useMemo(() => io(uri, opts), []);
 
 	useEffect(() => {
 		return () => {

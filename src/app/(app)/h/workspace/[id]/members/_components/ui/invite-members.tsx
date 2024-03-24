@@ -1,19 +1,15 @@
 'use client';
 
-import {
-	// PiLinkBold,
-	PiUserPlusBold,
-} from 'react-icons/pi';
+import { PiUserPlusBold } from 'react-icons/pi';
 import {
 	Dialog,
 	DialogContent,
 	DialogDescription,
-	// DialogFooter,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-} from '@/components/ui/dialog';
-import TextInput from '@/components/forms/TextInput';
+} from '@components/ui/dialog';
+import TextInput from '@components/core/text-field';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import { useToast } from '@components/ui/use-toast';
@@ -80,8 +76,6 @@ export default function InviteMembers() {
 		return () => {};
 	}, [inviteMembersMutation]);
 
-	const emailError = formik.touched.email && formik.errors.email;
-
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
@@ -99,14 +93,11 @@ export default function InviteMembers() {
 					</DialogDescription>
 				</DialogHeader>
 				<TextInput
+					formik={formik}
 					label="Email"
 					type="email"
 					name="email"
 					placeholder="Endereço de email"
-					onChange={formik.handleChange}
-					onBlur={formik.handleBlur}
-					value={formik.values.email}
-					error={emailError}
 				/>
 				<button
 					className="btn btn-primary btn-sm w-full"

@@ -24,7 +24,7 @@ export default async function Layout({
 		return redirect('/sign-in');
 	}
 
-	const user = await prisma.user.findUnique({
+	const initialData = await prisma.user.findUnique({
 		where: {
 			clerkId: userId,
 		},
@@ -43,11 +43,17 @@ export default async function Layout({
 			},
 		},
 	});
+
+	if (!initialData) {
+		await prisma.$disconnect();
+		return redirect('/sign-in');
+	}
+
 	await prisma.$disconnect();
 
 	return (
 		<div className="flex h-full w-full flex-col">
-			<Providers currentUser={user || ({} as TUser)}>{children}</Providers>
+			<Providers initialData={initialData}>{children}</Providers>
 		</div>
 	);
 }

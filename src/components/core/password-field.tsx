@@ -1,18 +1,21 @@
-import { useState } from 'react';
 import { PiEye, PiEyeClosed } from 'react-icons/pi';
+import { useBoolean } from 'usehooks-ts';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 	label: string;
-	error?: string | boolean;
+	formik: any;
+	name: string;
 }
 
 export default function PasswordInput({
 	label,
-	error = '',
+	formik,
+	name,
 	...rest
 }: InputProps) {
-	const [showPassowrd, setShowPassword] = useState(false);
-	const hasError = !!error;
+	const { value, toggle } = useBoolean(false);
+	const error = formik.touched[name] && formik.errors[name];
+
 	return (
 		<div className="form-control w-full">
 			<label className="label">
@@ -22,24 +25,28 @@ export default function PasswordInput({
 				<input
 					// eslint-disable-next-line react/jsx-props-no-spreading
 					{...rest}
+					name={name}
+					onChange={formik.handleChange}
+					onBlur={formik.handleBlur}
+					value={formik.values[name]}
 					className={`input input-bordered ${
-						hasError ? 'input-error' : ''
+						error ? 'input-error' : ''
 					} w-full ${rest.className || ''}`}
-					type={showPassowrd ? 'text' : 'password'}
+					type={value ? 'text' : 'password'}
 				/>
 				<button
 					type="button"
 					className="btn btn-square border border-l-0 border-gray-300 hover:border-gray-300 active:border-gray-300"
-					onClick={() => setShowPassword(!showPassowrd)}
+					onClick={toggle}
 				>
-					{showPassowrd ? (
+					{value ? (
 						<PiEye className="text-xl" />
 					) : (
 						<PiEyeClosed className="text-xl" />
 					)}
 				</button>
 			</label>
-			{hasError ? (
+			{error ? (
 				<label className="label">
 					<span className="label-text-alt text-error">{error}</span>
 				</label>

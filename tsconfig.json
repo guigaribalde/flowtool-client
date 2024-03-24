@@ -21,8 +21,9 @@
     "paths": {
       "@components/*": ["./src/components/*"],
       "@actions/*": ["./src/actions/*"],
-      "@prisma/*": ["./prisma/*"],
       "@auth/*": ["./src/auth/*"],
+      "@prisma/*": ["./prisma/*"],
+      "@public/*": ["./public/*"],
       "@/*": ["./src/*"]
     }
   },

@@ -1,6 +1,5 @@
 import { isOnSpace } from '@auth/index';
 import prisma from '@prisma/prisma';
-import Navbar from '@components/layout/ui/Navbar';
 import { Client } from './client';
 
 type LayoutParams = {

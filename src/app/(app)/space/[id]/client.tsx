@@ -3,12 +3,11 @@
 'use client';
 
 import SocketContextProviderComponent from '@/utils/contexts/SocketContext/Provider';
-import PointerBoard from '@components/layout/core/PointerBoard';
 import Tabs from '@components/core/tabs';
 import { PiGearFill, PiTriangleFill } from 'react-icons/pi';
 import { usePathname } from 'next/navigation';
-import Navbar from '@components/layout/ui/Navbar';
-import useCurrentUser from '../../_utils/hooks/useCurrentUser';
+import Navbar from '@components/core/navbar';
+import { useAppMetadata } from '@/stores/app-metadata/app-metadata';
 
 type ClientParams = {
 	params: {
@@ -20,17 +19,14 @@ export function Client({ children, params }: ClientParams) {
 	const pathname = usePathname();
 	const activeTab = pathname.split('/').pop();
 
-	const { user } = useCurrentUser();
-
-	const workspace = user.UserOnWorkSpace.find(
-		(uowp) =>
-			uowp.workSpace.Space.find((s) => s.id === params.id) !== undefined,
-	);
-
-	const space = workspace?.workSpace.Space.find((s) => s.id === params.id);
+	const user = useAppMetadata((state) => state.user);
+	const space = useAppMetadata((state) => state.spaces)[params.id];
+	const workspace = useAppMetadata((state) => state.workspaces)[
+		space.workSpaceId
+	];
 
 	const { name: spaceName } = space || { name: 'Espaço' };
-	const { name: workspaceName } = workspace?.workSpace || {
+	const { name: workspaceName } = workspace || {
 		name: 'Área de trabalho',
 	};
 
@@ -46,8 +42,7 @@ export function Client({ children, params }: ClientParams) {
 
 	return (
 		<SocketContextProviderComponent spaceId={params.id}>
-			<PointerBoard />
-			<Navbar username={user?.username} />
+			<Navbar username={user.username} />
 			<div className="flex w-full items-center justify-between border-b border-b-slate-300 px-6 py-2">
 				<div className="flex min-w-[300px] items-center">
 					<p className="flex items-center gap-4 text-slate-800">

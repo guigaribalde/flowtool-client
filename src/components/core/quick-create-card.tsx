@@ -14,7 +14,7 @@ export default function QuickCreateCard({
 	columnId,
 }: QuickCreateCardProps) {
 	const ref = useRef<HTMLDivElement>(null);
-	const { createTask, query } = useBoard();
+	const { createTask, board } = useBoard();
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
 		e.preventDefault();
@@ -22,7 +22,7 @@ export default function QuickCreateCard({
 		const name = e.currentTarget.name.value;
 
 		const index =
-			query.data?.columns.find((c) => c.id === columnId)?.tasks.length || 0;
+			board?.columns.find((c) => c.id === columnId)?.tasks.length || 0;
 
 		const payload = {
 			name,
@@ -31,7 +31,7 @@ export default function QuickCreateCard({
 			index,
 		};
 
-		createTask.mutate(payload);
+		createTask(payload);
 		setFalse();
 	};
 
@@ -55,7 +55,11 @@ export default function QuickCreateCard({
 				</span>
 
 				<div className="flex justify-end gap-2">
-					<button className="btn btn-primary btn-outline btn-sm" type="button">
+					<button
+						onClick={setFalse}
+						className="btn btn-primary btn-outline btn-sm"
+						type="button"
+					>
 						Cancelar
 					</button>
 					<button className="btn btn-primary btn-sm" type="submit">

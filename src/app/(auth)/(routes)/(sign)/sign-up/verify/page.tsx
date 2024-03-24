@@ -1,11 +1,10 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
-
 'use client';
 
 import { useFormik } from 'formik';
 import { useSignUp } from '@clerk/nextjs';
 import { useRouter, useSearchParams } from 'next/navigation';
-import TextInput from '@components/forms/TextInput';
+import TextInput from '@components/core/text-field';
+import SubmitButton from '@components/core/submit-button';
 
 interface Error {
 	code: string;
@@ -48,8 +47,6 @@ export default function Page() {
 					router.push(`/after-auth?invite=${invite}`);
 				}
 			} catch (err: any) {
-				// console.log(JSON.stringify(err, null, 2));
-
 				const errorResponse = err as ErrorResponse;
 				if (!errorResponse.clerkError) throw new Error('Erro desconhecido');
 				errorResponse.errors.forEach((error: Error) => {
@@ -64,7 +61,6 @@ export default function Page() {
 		},
 	});
 
-	const codeError = formik.touched.code && formik.errors.code;
 	return (
 		<div className="flex w-full max-w-lg flex-col items-center gap-8">
 			<div className="flex flex-col items-center gap-2">
@@ -78,27 +74,12 @@ export default function Page() {
 				className="flex w-full flex-col gap-5 p-8 md:rounded-xl md:bg-white md:shadow-lg"
 			>
 				<TextInput
+					formik={formik}
 					label="Codigo"
-					id="code"
 					name="code"
-					value={formik.values.code}
 					placeholder="Seu codigo"
-					onChange={formik.handleChange}
-					onBlur={formik.handleBlur}
-					error={codeError}
 				/>
-				<button
-					disabled={formik.isSubmitting || formik.isValidating}
-					className="btn btn-primary w-full"
-					type="submit"
-				>
-					{formik.isSubmitting || formik.isValidating ? (
-						<span className="loading loading-spinner" />
-					) : (
-						''
-					)}
-					VERIFICAR
-				</button>
+				<SubmitButton formik={formik}>VERIFICAR</SubmitButton>
 			</form>
 		</div>
 	);

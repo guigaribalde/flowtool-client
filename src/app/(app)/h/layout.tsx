@@ -9,22 +9,24 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-} from '@/components/ui/dialog';
-import TextInput from '@/components/forms/TextInput';
+} from '@components/ui/dialog';
+import TextInput from '@components/core/text-field';
 import { PiPlus } from 'react-icons/pi';
 import axios from 'axios';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { WorkSpace } from '@prisma/client';
-import Navbar from '@components/layout/ui/Navbar';
+import Navbar from '@components/core/navbar';
+import SubmitButton from '@components/core/submit-button';
+import { useAppMetadata } from '@/stores/app-metadata/app-metadata';
+import { toast } from '@components/ui/use-toast';
 import Spaces from './_components/Spaces';
 import Workspaces from './_components/Workspaces';
-import useCurrentUser from '../_utils/hooks/useCurrentUser';
-import { TUser } from '../_utils/context/CurrentUserContext';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-	const { user, setUser } = useCurrentUser();
-	const workSpaces = user?.UserOnWorkSpace.map((uows) => uows.workSpace);
+	const workSpaces = useAppMetadata((state) => state.workspacesToArray());
+	const user = useAppMetadata((state) => state.user);
+	const addWorkspace = useAppMetadata((state) => state.addWorkspace);
 	const formik = useFormik({
 		initialValues: {
 			name: '',
@@ -37,35 +39,26 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 				const { data } = await axios.post('/api/workspace/create', values);
 				const { workspace }: { workspace: WorkSpace } = data;
 
-				console.log(workspace);
-
-				setUser((old) => {
-					const newState = {
-						...old,
-						UserOnWorkSpace: [
-							...old.UserOnWorkSpace,
-							{
-								workSpace: {
-									...workspace,
-									Space: [],
-								},
-							},
-						],
-					} as TUser;
-					return newState;
-				});
+				addWorkspace(workspace);
 
 				resetForm();
-			} catch (error) {
-				console.log(error);
+				toast({
+					title: 'Area de trabalho criada com sucesso',
+					description: 'O espaco foi criado com sucesso',
+				});
+			} catch (e) {
+				console.log(e);
+				toast({
+					title: 'Erro ao tentar criar Area de trabalho',
+					description: 'Tente novamente mais tarde',
+				});
 			}
 		},
 	});
-	const nameError = formik.errors.name && formik.touched.name;
 
 	return (
 		<>
-			<Navbar username={user?.username} />
+			<Navbar username={user.username} />
 			<div className="mx-auto mt-5 flex w-full max-w-5xl gap-5 p-5">
 				<div className="flex w-full max-w-[256px] flex-col gap-3">
 					<div className="flex flex-col gap-1">
@@ -91,26 +84,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 										</DialogDescription>
 									</DialogHeader>
 									<TextInput
+										formik={formik}
 										label="Nome"
 										type="name"
 										name="name"
 										placeholder="Nome da sua área de trabalho"
-										onChange={formik.handleChange}
-										onBlur={formik.handleBlur}
-										value={formik.values.name}
-										error={nameError}
 									/>
-									<button
-										className="btn btn-primary btn-sm w-full"
-										type="button"
-										disabled={formik.isSubmitting || formik.isValidating}
+									<SubmitButton
 										onClick={() => formik.handleSubmit()}
+										className="btn-sm"
+										formik={formik}
 									>
-										{(formik.isSubmitting || formik.isValidating) && (
-											<span className="loading loading-spinner" />
-										)}
 										Criar
-									</button>
+									</SubmitButton>
 								</DialogContent>
 							</Dialog>
 						</div>

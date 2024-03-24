@@ -35,12 +35,16 @@ export default async function Page({ params }: PageParams) {
 	});
 
 	await prisma.$disconnect();
-	const board: TBoard = space?.boards[0];
+
+	if (!space) return null;
 
 	return (
-		<div className="h-full w-full overflow-x-auto bg-gray-100">
-			<div className="flex h-full min-w-fit gap-6 px-9 pt-8">
-				<Providers spaceId={params.id} board={board}>
+		<div
+			id="board-wrapper"
+			className="h-full w-full overflow-x-auto bg-gray-100"
+		>
+			<div className="relative flex h-full min-w-fit gap-6 px-9 pt-8">
+				<Providers spaceId={params.id} initialData={space}>
 					<Board spaceId={params.id} />
 				</Providers>
 			</div>

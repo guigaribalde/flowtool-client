@@ -6,15 +6,68 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
+import {
+	ColumnDef,
+	Row,
+	Table,
+	createColumnHelper,
+} from '@tanstack/react-table';
 import {
 	PiDotsThreeOutlineVerticalFill,
 	PiUserMinusBold,
 } from 'react-icons/pi';
-import { TUser } from '@/app/(app)/_utils/context/CurrentUserContext';
+import { useAppMetadata } from '@/stores/app-metadata/app-metadata';
 import { User } from '../../../_utils/context/UsersContext';
 
 const columnHelper = createColumnHelper<User>();
+
+interface OptionsProps {
+	row: Row<User>;
+	table: Table<User>;
+}
+
+function Options({ row, table }: OptionsProps) {
+	const { meta } = table.options;
+	const { id } = row.original;
+
+	const { removeUser, workspaceId } = meta as {
+		removeUser: (id: string) => void;
+		workspaceId: string;
+	};
+
+	const user = useAppMetadata((state) => state.user);
+	const UserOnWorkSpace = useAppMetadata((state) =>
+		state.userOnWorkSpacesToArray(),
+	).find((uowp) => uowp.userId === user.id && uowp.workSpaceId === workspaceId);
+	const isCurrentUser = UserOnWorkSpace?.id === id;
+
+	const isAdmin =
+		UserOnWorkSpace?.userRole === 'admin' ||
+		UserOnWorkSpace?.userRole === 'owner';
+
+	if (isCurrentUser || !isAdmin) return null;
+
+	return (
+		<div className="flex w-full justify-end">
+			<DropdownMenu>
+				<DropdownMenuTrigger>
+					<div className="btn btn-primary btn-ghost btn-sm">
+						<PiDotsThreeOutlineVerticalFill className="text-md" />
+					</div>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent side="bottom" align="end">
+					<DropdownMenuItem
+						onClick={() => removeUser(id)}
+						className="flex cursor-pointer items-center gap-2"
+					>
+						<PiUserMinusBold />
+						<span>Expulsar</span>
+					</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</div>
+	);
+}
 
 export const columns: ColumnDef<User>[] = [
 	{
@@ -67,47 +120,7 @@ export const columns: ColumnDef<User>[] = [
 			const { meta } = table.options;
 			if (!meta) return null;
 
-			const { id } = row.original;
-
-			const { removeUser, getCurrentUser, workspaceId } = meta as {
-				removeUser: (id: string) => void;
-				getCurrentUser: () => { user: TUser };
-				workspaceId: string;
-			};
-
-			const currentUser = getCurrentUser().user;
-			const currentUserOnSpace = currentUser.UserOnWorkSpace.find(
-				(uowp) =>
-					uowp.userId === currentUser.id && uowp.workSpaceId === workspaceId,
-			);
-			const isCurrentUser = currentUserOnSpace?.id === id;
-
-			const isAdmin =
-				currentUserOnSpace?.userRole === 'admin' ||
-				currentUserOnSpace?.userRole === 'owner';
-
-			if (isCurrentUser || !isAdmin) return null;
-
-			return (
-				<div className="flex w-full justify-end">
-					<DropdownMenu>
-						<DropdownMenuTrigger>
-							<div className="btn btn-primary btn-ghost btn-sm">
-								<PiDotsThreeOutlineVerticalFill className="text-md" />
-							</div>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent side="bottom" align="end">
-							<DropdownMenuItem
-								onClick={() => removeUser(id)}
-								className="flex cursor-pointer items-center gap-2"
-							>
-								<PiUserMinusBold />
-								<span>Expulsar</span>
-							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
-				</div>
-			);
+			return <Options row={row} table={table} />;
 		},
 	}),
 ];

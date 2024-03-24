@@ -1,10 +1,16 @@
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 	label: string;
-	error?: string | boolean;
+	formik: any;
+	name: string;
 }
 
-export default function TextInput({ label, error = '', ...rest }: InputProps) {
-	const hasError = !!error;
+export default function TextInput({
+	label,
+	formik,
+	name,
+	...rest
+}: InputProps) {
+	const error = formik.touched[name] && formik.errors[name];
 	return (
 		<div className="form-control w-full">
 			<label className="label">
@@ -13,11 +19,15 @@ export default function TextInput({ label, error = '', ...rest }: InputProps) {
 			<input
 				// eslint-disable-next-line react/jsx-props-no-spreading
 				{...rest}
-				className={`input input-bordered ${
-					hasError ? 'input-error' : ''
-				} w-full ${rest.className || ''}`}
+				name={name}
+				onChange={formik.handleChange}
+				onBlur={formik.handleBlur}
+				value={formik.values[name]}
+				className={`input input-bordered ${error ? 'input-error' : ''} w-full ${
+					rest.className || ''
+				}`}
 			/>
-			{hasError ? (
+			{error ? (
 				<label className="label">
 					<span className="label-text-alt text-error">{error}</span>
 				</label>

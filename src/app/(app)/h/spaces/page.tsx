@@ -8,8 +8,8 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-} from '@/components/ui/dialog';
-import TextInput from '@/components/forms/TextInput';
+} from '@components/ui/dialog';
+import TextInput from '@components/core/text-field';
 import * as Yup from 'yup';
 import { useFormik } from 'formik';
 import {
@@ -23,24 +23,19 @@ import axios from 'axios';
 import { Space } from '@prisma/client';
 import { toast } from '@/components/ui/use-toast';
 import Link from 'next/link';
-import useCurrentUser from '../../_utils/hooks/useCurrentUser';
+import SubmitButton from '@components/core/submit-button';
+import { useAppMetadata } from '@/stores/app-metadata/app-metadata';
 
 export default function Page() {
-	const { user, setUser } = useCurrentUser();
-	const workspaces = user.UserOnWorkSpace.map((u) => u.workSpace);
-	const spaces = user.UserOnWorkSpace.flatMap((u) => {
-		return [
-			...u.workSpace.Space.map((s) => ({
-				...s,
-				workSpaceName: u.workSpace.name,
-			})),
-		];
-	});
+	const rawWorkspaces = useAppMetadata((state) => state.workspaces);
+	const workspaces = useAppMetadata((state) => state.workspacesToArray());
+	const spaces = useAppMetadata((state) => state.spacesToArray());
+	const addSpace = useAppMetadata((state) => state.addSpace);
 
 	const formik = useFormik({
 		initialValues: {
 			name: '',
-			workspaceId: workspaces[0].id || '',
+			workspaceId: workspaces[0]?.id || '',
 		},
 		validationSchema: Yup.object({
 			name: Yup.string().required('Campo obrigatório'),
@@ -49,25 +44,7 @@ export default function Page() {
 			try {
 				const { data } = await axios.post('/api/space/create', values);
 				const { space }: { space: Space } = data;
-				setUser((old) => {
-					const newState = {
-						...old,
-						UserOnWorkSpace: old.UserOnWorkSpace.map((uowp) => {
-							if (uowp.workSpace.id === space.workSpaceId) {
-								return {
-									...uowp,
-									workSpace: {
-										...uowp.workSpace,
-										Space: [...uowp.workSpace.Space, space],
-									},
-								};
-							}
-							return uowp;
-						}),
-					};
-
-					return newState;
-				});
+				addSpace(space);
 
 				resetForm();
 				toast({
@@ -77,25 +54,23 @@ export default function Page() {
 			} catch (e) {
 				console.log(e);
 				toast({
-					title: 'Erro ao convidar usuário',
+					title: 'Erro ao tentar criar espaco',
 					description: 'Tente novamente mais tarde',
 				});
 			}
 		},
 	});
 
-	const nameError = formik.touched.name && formik.errors.name;
-
 	return (
 		<div className="flex w-full flex-col">
 			<h1 className="text-xl font-semibold text-slate-700">Seus espacos</h1>
 			<div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-				{spaces.map(({ id, name, workSpaceName }) => (
+				{spaces.map(({ id, name, workSpaceId }) => (
 					<Link href={`/space/${id}/board`} key={id}>
 						<div className="h-24 w-full cursor-pointer rounded-lg bg-gradient-to-br from-cyan-300 to-cyan-500 p-3 transition-all duration-200 hover:scale-105 hover:opacity-90 hover:shadow-lg active:scale-100">
 							<div className="flex w-full flex-col">
 								<span className="flex items-center gap-2 text-xs text-slate-500 ">
-									<PiFolderFill /> {workSpaceName}
+									<PiFolderFill /> {rawWorkspaces[workSpaceId].name}
 								</span>
 								<span className="font-semibold text-slate-700">{name}</span>
 							</div>
@@ -121,14 +96,11 @@ export default function Page() {
 							</DialogDescription>
 						</DialogHeader>
 						<TextInput
+							formik={formik}
 							label="Nome"
 							type="name"
 							name="name"
 							placeholder="Nome do seu espaco"
-							onChange={formik.handleChange}
-							onBlur={formik.handleBlur}
-							value={formik.values.name}
-							error={nameError}
 						/>
 						<Select
 							value={formik.values.workspaceId}
@@ -150,17 +122,14 @@ export default function Page() {
 								))}
 							</SelectContent>
 						</Select>
-						<button
+
+						<SubmitButton
 							onClick={() => formik.handleSubmit()}
-							className="btn btn-primary btn-sm w-full"
-							type="button"
-							disabled={formik.isSubmitting || formik.isValidating}
+							className="btn-sm"
+							formik={formik}
 						>
-							{(formik.isSubmitting || formik.isValidating) && (
-								<span className="loading loading-spinner" />
-							)}
 							Criar
-						</button>
+						</SubmitButton>
 					</DialogContent>
 				</Dialog>
 			</div>

@@ -8,8 +8,9 @@ import { useSignUp, useClerk, useSession } from '@clerk/nextjs';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
-import TextInput from '@components/forms/TextInput';
-import PasswordInput from '@components/forms/PasswordInput';
+import TextInput from '@components/core/text-field';
+import PasswordInput from '@components/core/password-field';
+import SubmitButton from '@components/core/submit-button';
 
 interface Error {
 	code: string;
@@ -61,14 +62,12 @@ export default function Page() {
 					password: values.password,
 					username: values.username,
 				});
-				// send the email.
 				await signUp.prepareEmailAddressVerification({
 					strategy: 'email_code',
 				});
 
 				router.push(`/sign-up/verify?invite=${invite}`);
 			} catch (err: any) {
-				// console.log(JSON.stringify(err, null, 2));
 				const errorResponse = err as ErrorResponse;
 				if (!errorResponse.clerkError) throw new Error('Erro desconhecido');
 				errorResponse.errors.forEach((error: Error) => {
@@ -91,10 +90,6 @@ export default function Page() {
 		}
 	}, [isSessionLoaded, isReady]);
 
-	const emailError = formik.touched.email && formik.errors.email;
-	const passwordError = formik.touched.password && formik.errors.password;
-	const usernameError = formik.touched.username && formik.errors.username;
-
 	return (
 		<div className="flex w-full max-w-lg flex-col items-center gap-8">
 			<div className="flex flex-col items-center gap-2">
@@ -109,51 +104,28 @@ export default function Page() {
 			>
 				<div className="flex w-full flex-col gap-2">
 					<TextInput
+						formik={formik}
 						placeholder="Seu nome de usuário"
-						onChange={formik.handleChange}
-						onBlur={formik.handleBlur}
-						value={formik.values.username}
-						id="username"
 						name="username"
 						type="text"
 						label="Nome de usuário"
-						error={usernameError}
 					/>
 					<TextInput
+						formik={formik}
 						placeholder="Seu email"
-						onChange={formik.handleChange}
-						onBlur={formik.handleBlur}
-						value={formik.values.email}
-						id="email"
 						name="email"
 						type="email"
 						label="Email"
-						error={emailError}
 					/>
 
 					<PasswordInput
+						formik={formik}
 						placeholder="Sua senha"
 						label="Senha"
-						onChange={formik.handleChange}
-						onBlur={formik.handleBlur}
-						value={formik.values.password}
-						id="password"
 						name="password"
-						error={passwordError}
 					/>
 				</div>
-				<button
-					disabled={formik.isSubmitting || formik.isValidating}
-					className="btn btn-primary w-full"
-					type="submit"
-				>
-					{formik.isSubmitting || formik.isValidating ? (
-						<span className="loading loading-spinner" />
-					) : (
-						''
-					)}
-					REGISTRAR-SE
-				</button>
+				<SubmitButton formik={formik}>REGISTRAR-SE</SubmitButton>
 				<div className="flex justify-center gap-1 text-slate-500">
 					<span>Ja possui uma conta?</span>
 					<Link href="/sign-in">

@@ -1,5 +1,3 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
-
 'use client';
 
 import { useFormik } from 'formik';
@@ -8,8 +6,9 @@ import { useSignIn, useClerk, useSession } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
-import TextInput from '@components/forms/TextInput';
-import PasswordInput from '@components/forms/PasswordInput';
+import TextInput from '@components/core/text-field';
+import PasswordInput from '@components/core/password-field';
+import SubmitButton from '@components/core/submit-button';
 
 interface Error {
 	code: string;
@@ -82,9 +81,6 @@ export default function Page() {
 		}
 	}, [isSessionLoaded, isReady]);
 
-	const emailError = formik.touched.email && formik.errors.email;
-	const passwordError = formik.touched.password && formik.errors.password;
-
 	return (
 		<div className="flex w-full max-w-lg flex-col items-center gap-8">
 			<div className="flex flex-col items-center gap-2">
@@ -99,39 +95,20 @@ export default function Page() {
 			>
 				<div className="flex w-full flex-col gap-2">
 					<TextInput
+						formik={formik}
 						label="Email"
 						placeholder="Seu email"
-						onChange={formik.handleChange}
-						onBlur={formik.handleBlur}
-						value={formik.values.email}
-						id="email"
 						name="email"
 						type="email"
-						error={emailError}
 					/>
 					<PasswordInput
+						formik={formik}
 						label="Senha"
 						placeholder="Sua senha"
-						onChange={formik.handleChange}
-						onBlur={formik.handleBlur}
-						value={formik.values.password}
-						id="password"
 						name="password"
-						error={passwordError}
 					/>
 				</div>
-				<button
-					disabled={formik.isSubmitting || formik.isValidating}
-					className="btn btn-primary w-full"
-					type="submit"
-				>
-					{formik.isSubmitting || formik.isValidating ? (
-						<span className="loading loading-spinner" />
-					) : (
-						''
-					)}
-					ENTRAR
-				</button>
+				<SubmitButton formik={formik}>ENTRAR</SubmitButton>
 				<div className="flex justify-center gap-1 text-slate-500">
 					<span>Não tem uma conta?</span>
 					<Link href="/sign-up">
